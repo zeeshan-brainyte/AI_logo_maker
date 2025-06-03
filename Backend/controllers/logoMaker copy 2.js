@@ -43,7 +43,6 @@ const createPromptTemplate = (prompt) => {
 };
 
 exports.upload = async (req, res) => {
-    console.time("Logo generation time");
     try {
         let { prompt } = req.body;
         prompt = JSON.parse(prompt);
@@ -52,7 +51,7 @@ exports.upload = async (req, res) => {
             return res.status(400).json({ error: "Prompt is required" });
         }
 
-        // console.log("Parsed prompt:", prompt);
+        console.log("Parsed prompt:", prompt);
 
         const variantCount = prompt.variantCount || 8;
 
@@ -60,7 +59,7 @@ exports.upload = async (req, res) => {
         if (prompt.randomStylePreset) {
             const stylePresetIds = Object.keys(stylePresets);
             const uniqueNumbers = generateUniqueRandomNumbers(variantCount, stylePresetIds.length);
-            // console.log("Unique random numbers (style preset ids):", uniqueNumbers);
+            console.log("Unique random numbers (style preset ids):", uniqueNumbers);
 
             // Prepare prompts with different style presets
             const promptStrings = uniqueNumbers.map((num) => {
@@ -69,72 +68,37 @@ exports.upload = async (req, res) => {
                 return createPromptTemplate(promptWithRandomPreset);
             });
 
-            // console.log("Generated prompt strings for random style presets:", promptStrings);
+            console.log("Generated prompt strings for random style presets:", promptStrings);
 
-            // Run API calls in parallel with error handling
-            let results;
-            try {
-                results = await Promise.allSettled(
-                    promptStrings.map((promptString) =>
-                        openai.images.generate({
-                            model: "gpt-image-1",
-                            prompt: promptString,
-                            n: 1,
-                            size: "1024x1024",
-                            background: "opaque",
-                        })
-                    )
+            // Run API calls in parallel
+            const responses = await Promise.all(
+                promptStrings.map((promptString) =>
+                    openai.images.generate({
+                        model: "gpt-image-1",
+                        prompt: promptString,
+                        n: 1,
+                        size: "1024x1024",
+                        background: "opaque",
+                    })
+                )
+            );
+
+            if (!fs.existsSync("output_logos")) {
+                fs.mkdirSync("output_logos");
+            }
+
+            responses.forEach((response, idx) => {
+                const image = response.data[0];
+                const image_base64 = image.b64_json;
+                const image_bytes = Buffer.from(image_base64, "base64");
+                fs.writeFileSync(
+                    `output_logos/${prompt.companyName}_${Date.now()}_${idx + 1}.png`,
+                    image_bytes
                 );
-            } catch (apiError) {
-                // This catch is unlikely to trigger with allSettled, but keep for safety
-                console.error("Unexpected error during image generation:", apiError);
-                console.timeEnd("Logo generation time");
-                return res.status(502).json({
-                    error: "Unexpected error during logo generation.",
-                    details: apiError.message || apiError.toString(),
-                });
-            }
+            });
 
-            // Separate successful and failed results
-            const successes = results.filter(r => r.status === "fulfilled").map(r => r.value);
-            const failures = results.filter(r => r.status === "rejected");
-
-            if (successes.length === 0) {
-                console.timeEnd("Logo generation time");
-                return res.status(502).json({
-                    error: "All logo generations failed.",
-                    details: failures.map(f => f.reason?.message || f.reason?.toString()),
-                });
-            }
-
-            // Save only successful images
-            try {
-                if (!fs.existsSync("output_logos")) {
-                    fs.mkdirSync("output_logos");
-                }
-
-                successes.forEach((response, idx) => {
-                    const image = response.data[0];
-                    const image_base64 = image.b64_json;
-                    const image_bytes = Buffer.from(image_base64, "base64");
-                    fs.writeFileSync(
-                        `output_logos/${prompt.companyName}_${Date.now()}_${idx + 1}.png`,
-                        image_bytes
-                    );
-                });
-            } catch (fsError) {
-                console.error("Error saving generated images:", fsError);
-                console.timeEnd("Logo generation time");
-                return res.status(500).json({
-                    error: "Some logos were generated but could not be saved.",
-                    details: fsError.message || fsError.toString(),
-                });
-            }
-
-            console.timeEnd("Logo generation time");
             return res.status(200).json({
-                message: `Logos generated: ${successes.length}. Failed: ${failures.length}.`,
-                failedDetails: failures.map(f => f.reason?.message || f.reason?.toString()),
+                message: "Logos generated successfully with random style presets",
             });
         } else {
             // Use the selected stylePreset as before
@@ -161,7 +125,7 @@ exports.upload = async (req, res) => {
                     image_bytes
                 );
             });
-            console.timeEnd("Logo generation time");
+
             return res.status(200).json({
                 message: "Logo generated successfully",
             });
