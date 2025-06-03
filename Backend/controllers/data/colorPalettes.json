@@ -1,0 +1,71 @@
+[
+    {
+        "id": 1,
+        "name": "Tech Blue",
+        "colors": [
+            "#0F172A",
+            "#1E293B",
+            "#3B82F6",
+            "#93C5FD"
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Industrial Gray",
+        "colors": [
+            "#1C1C1C",
+            "#434343",
+            "#B0B0B0",
+            "#F5F5F5"
+        ]
+    },
+    {
+        "id": 3,
+        "name": "Vibrant Orange",
+        "colors": [
+            "#1E1E1E",
+            "#FF6B00",
+            "#FFA559",
+            "#F2E8CF"
+        ]
+    },
+    {
+        "id": 4,
+        "name": "Electric Green",
+        "colors": [
+            "#0D1B2A",
+            "#1B998B",
+            "#38B000",
+            "#C1FBA4"
+        ]
+    },
+    {
+        "id": 5,
+        "name": "Elegant Gold",
+        "colors": [
+            "#222222",
+            "#C0A060",
+            "#FFF8DC",
+            "#8C7853"
+        ]
+    },
+    {
+        "id": 6,
+        "name": "Minimal Black & White",
+        "colors": [
+            "#000000",
+            "#FFFFFF",
+            "#888888"
+        ]
+    },
+    {
+        "id": 7,
+        "name": "Pastel Gradient",
+        "colors": [
+            "#E0BBE4",
+            "#957DAD",
+            "#D291BC",
+            "#FEC8D8"
+        ]
+    }
+]

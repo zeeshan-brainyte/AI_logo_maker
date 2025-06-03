@@ -1,0 +1,182 @@
+[
+    {
+        "id": 1,
+        "code": "TEC",
+        "industry": "Technology",
+        "description": "Software, AI, SaaS, IT services"
+    },
+    {
+        "id": 2,
+        "code": "ENG",
+        "industry": "Engineering",
+        "description": "Mechanical, electrical, civil, structural"
+    },
+    {
+        "id": 3,
+        "code": "CON",
+        "industry": "Construction",
+        "description": "Builders, contractors, architects"
+    },
+    {
+        "id": 4,
+        "code": "MFG",
+        "industry": "Manufacturing",
+        "description": "Industrial goods, machinery, equipment"
+    },
+    {
+        "id": 5,
+        "code": "AUT",
+        "industry": "Automotive",
+        "description": "Car makers, EV, accessories, services"
+    },
+    {
+        "id": 6,
+        "code": "ENR",
+        "industry": "Energy & Utilities",
+        "description": "Solar, gas, power, green energy"
+    },
+    {
+        "id": 7,
+        "code": "TEL",
+        "industry": "Telecommunications",
+        "description": "ISPs, mobile networks, hardware"
+    },
+    {
+        "id": 8,
+        "code": "FIN",
+        "industry": "Finance",
+        "description": "Banks, investment firms, lending"
+    },
+    {
+        "id": 9,
+        "code": "INS",
+        "industry": "Insurance",
+        "description": "Health, life, vehicle, property"
+    },
+    {
+        "id": 10,
+        "code": "RLE",
+        "industry": "Real Estate",
+        "description": "Residential, commercial, property mgmt"
+    },
+    {
+        "id": 11,
+        "code": "HLT",
+        "industry": "Healthcare",
+        "description": "Hospitals, clinics, medical products"
+    },
+    {
+        "id": 12,
+        "code": "PHA",
+        "industry": "Pharmaceuticals",
+        "description": "Drug companies, biotech, R&D"
+    },
+    {
+        "id": 13,
+        "code": "BIO",
+        "industry": "Biotechnology",
+        "description": "Genetic tech, research, life sciences"
+    },
+    {
+        "id": 14,
+        "code": "EDU",
+        "industry": "Education",
+        "description": "Schools, edtech, tutoring, academies"
+    },
+    {
+        "id": 15,
+        "code": "LEG",
+        "industry": "Legal Services",
+        "description": "Law firms, legal consultants"
+    },
+    {
+        "id": 16,
+        "code": "HRR",
+        "industry": "HR & Recruitment",
+        "description": "Talent acquisition, staffing, HR tech"
+    },
+    {
+        "id": 17,
+        "code": "CST",
+        "industry": "Consulting",
+        "description": "Business, strategy, marketing consultants"
+    },
+    {
+        "id": 18,
+        "code": "NPO",
+        "industry": "Non-Profit / NGO",
+        "description": "Social impact, charity, global initiatives"
+    },
+    {
+        "id": 19,
+        "code": "ECM",
+        "industry": "E-commerce",
+        "description": "Online stores, marketplaces, platforms"
+    },
+    {
+        "id": 20,
+        "code": "RTL",
+        "industry": "Retail",
+        "description": "Brick-and-mortar stores, consumer goods"
+    },
+    {
+        "id": 21,
+        "code": "FNB",
+        "industry": "Food & Beverage",
+        "description": "Restaurants, packaged goods, drinks"
+    },
+    {
+        "id": 22,
+        "code": "TRV",
+        "industry": "Travel & Hospitality",
+        "description": "Hotels, booking, travel agencies"
+    },
+    {
+        "id": 23,
+        "code": "FAS",
+        "industry": "Fashion & Apparel",
+        "description": "Clothing, footwear, accessories"
+    },
+    {
+        "id": 24,
+        "code": "BTW",
+        "industry": "Beauty & Wellness",
+        "description": "Salons, skincare, fitness, mental health"
+    },
+    {
+        "id": 25,
+        "code": "ENT",
+        "industry": "Entertainment & Media",
+        "description": "TV, film, music, podcasts, publishing"
+    },
+    {
+        "id": 26,
+        "code": "GAM",
+        "industry": "Gaming & Esports",
+        "description": "Game devs, streamers, teams, platforms"
+    },
+    {
+        "id": 27,
+        "code": "ART",
+        "industry": "Art & Design",
+        "description": "Artists, studios, creative portfolios"
+    },
+    {
+        "id": 28,
+        "code": "MKT",
+        "industry": "Marketing & Advertising",
+        "description": "Agencies, branding, performance marketing"
+    },
+    {
+        "id": 29,
+        "code": "CYB",
+        "industry": "Cybersecurity",
+        "description": "Digital protection, encryption, SaaS"
+    },
+    {
+        "id": 30,
+        "code": "WEB",
+        "industry": "Web3 / Blockchain",
+        "description": "Crypto, NFTs, decentralized platforms"
+    }
+]
