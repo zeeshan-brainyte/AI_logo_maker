@@ -22,14 +22,13 @@ const PromptTemplate = () => {
     // Handle random style preset.
     // user can either select a style preset or use a random one (3 paths with variation).
     // input custom prompt from user and inhance it with chatgpt api then send response to image generation api.
-    
+
 
     const [industries, setIndustries] = useState([]);
     const [colorSchemes, setColorSchemes] = useState([]);
     const [fontStyles, setFontStyles] = useState([]);
     const [stylePresets, setStylePresets] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [randomStylePreset, setRandomStylePreset] = useState(false);
 
     useEffect(() => {
         const fetchIndustries = async () => {
@@ -194,12 +193,11 @@ const PromptTemplate = () => {
                     </label>
                     <select
                         name="stylePreset"
-                        disabled={randomStylePreset}
+                        disabled={promptData.randomStylePreset}
                         value={promptData.stylePreset}
                         onChange={handleChange}
-                        className={`my-1  w-full text-text-primary bg-bg-primary focus:outline-none p-2 border border-bg-tertiary rounded-lg ${
-                            randomStylePreset ? "cursor-not-allowed opacity-50" : ""
-                        }`}
+                        className={`my-1  w-full text-text-primary bg-bg-primary focus:outline-none p-2 border border-bg-tertiary rounded-lg ${promptData.randomStylePreset ? "cursor-not-allowed opacity-50" : ""
+                            }`}
                     >
                         <option value="">Select a style preset</option>
                         {stylePresets.map((preset) => (
@@ -215,8 +213,10 @@ const PromptTemplate = () => {
                         type="checkbox"
                         id="randomStylePreset"
                         name="randomStylePreset"
-                        checked={randomStylePreset}
-                        onChange={(e) => setRandomStylePreset(e.target.checked)}
+                        checked={promptData.randomStylePreset}
+                        onChange={(e) =>
+                            setPromptData({ ...promptData, randomStylePreset: e.target.checked })
+                        }
                         className="mr-2"
                     />
                     <label

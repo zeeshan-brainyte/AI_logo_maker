@@ -1,6 +1,5 @@
-[
-    {
-        "id": 1,
+{
+    "1": {
         "name": "Tech Blue",
         "colors": [
             "#0F172A",
@@ -9,8 +8,7 @@
             "#93C5FD"
         ]
     },
-    {
-        "id": 2,
+    "2": {
         "name": "Industrial Gray",
         "colors": [
             "#1C1C1C",
@@ -19,8 +17,7 @@
             "#F5F5F5"
         ]
     },
-    {
-        "id": 3,
+    "3": {
         "name": "Vibrant Orange",
         "colors": [
             "#1E1E1E",
@@ -29,8 +26,7 @@
             "#F2E8CF"
         ]
     },
-    {
-        "id": 4,
+    "4": {
         "name": "Electric Green",
         "colors": [
             "#0D1B2A",
@@ -39,8 +35,7 @@
             "#C1FBA4"
         ]
     },
-    {
-        "id": 5,
+    "5": {
         "name": "Elegant Gold",
         "colors": [
             "#222222",
@@ -49,8 +44,7 @@
             "#8C7853"
         ]
     },
-    {
-        "id": 6,
+    "6": {
         "name": "Minimal Black & White",
         "colors": [
             "#000000",
@@ -58,8 +52,7 @@
             "#888888"
         ]
     },
-    {
-        "id": 7,
+    "7": {
         "name": "Pastel Gradient",
         "colors": [
             "#E0BBE4",
@@ -68,4 +61,4 @@
             "#FEC8D8"
         ]
     }
-]
+}

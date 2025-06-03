@@ -1,52 +1,42 @@
-[
-    {
-        "id": 1,
+{
+    "1": {
         "name": "Roboto",
         "description": "modern sans-serif font"
     },
-    {
-        "id": 2,
+    "2": {
         "name": "Montserrat",
         "description": "rounded modern font"
     },
-    {
-        "id": 3,
+    "3": {
         "name": "Bebas Neue",
         "description": "bold uppercase display font"
     },
-    {
-        "id": 4,
+    "4": {
         "name": "Orbitron",
         "description": "futuristic techno font"
     },
-    {
-        "id": 5,
+    "5": {
         "name": "Anton",
         "description": "heavy bold font"
     },
-    {
-        "id": 6,
+    "6": {
         "name": "Playfair Display",
         "description": "elegant serif font"
     },
-    {
-        "id": 7,
+    "7": {
         "name": "Cinzel",
         "description": "ancient roman serif font"
     },
-    {
-        "id": 8,
+    "8": {
         "name": "Inter",
         "description": "minimal clean sans-serif font"
     },
-    {
-        "id": 9,
+    "9": {
         "name": "Courier New",
         "description": "monospaced font"
     },
-    {
-        "id": 10,
+    "10": {
         "name": "Lobster",
         "description": "handwritten cursive font"
     }
-]
+}

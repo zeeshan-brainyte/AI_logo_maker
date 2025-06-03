@@ -1,102 +1,82 @@
-[
-    {
-        "id": 1,
+{
+    "1": {
         "name": "Esports Emblem",
         "description": "Bold, aggressive, often featuring a mascot or shield. Great for gaming or youth brands."
     },
-    {
-        "id": 2,
+    "2": {
         "name": "Futuristic Tech",
         "description": "Sleek, angular lines, neon accents, and cyber-inspired forms. Ideal for AI, robotics, SaaS."
     },
-    {
-        "id": 3,
+    "3": {
         "name": "Industrial Vector",
         "description": "Gear elements, strong outlines, dark tones. For engineering, construction, manufacturing."
     },
-    {
-        "id": 4,
+    "4": {
         "name": "Minimal Geometric",
         "description": "Clean lines, simple shapes, modern symmetry. Perfect for startups and digital brands."
     },
-    {
-        "id": 5,
+    "5": {
         "name": "Modern Flat Design",
         "description": "No gradients, simple icons, two-tone palette. Works well for apps and digital tools."
     },
-    {
-        "id": 6,
+    "6": {
         "name": "Luxury Serif Branding",
         "description": "Elegant serif fonts, gold/black tones. Suitable for fashion, jewelry, upscale brands."
     },
-    {
-        "id": 7,
+    "7": {
         "name": "Cyberpunk Aesthetic",
         "description": "Neon lights, tech armor, high contrast. Perfect for futuristic, gaming, or AI products."
     },
-    {
-        "id": 8,
+    "8": {
         "name": "Nature Organic",
         "description": "Soft, curved forms, earthy colors. Ideal for wellness, environmental, health products."
     },
-    {
-        "id": 9,
+    "9": {
         "name": "Badge / Stamp Style",
         "description": "Circular or shield layouts with text wraps. Ideal for heritage, outdoor, food & beverage."
     },
-    {
-        "id": 10,
+    "10": {
         "name": "Mascot-Based Logo",
         "description": "Central illustrated character (e.g., hawk, robot, wolf). Works well for esports, schools."
     },
-    {
-        "id": 11,
+    "11": {
         "name": "Lettermark Monogram",
         "description": "Initial-based logo (e.g., ‘TE’ for Titan Engineering). Ideal for corporate or minimalist brands."
     },
-    {
-        "id": 12,
+    "12": {
         "name": "Wordmark Bold",
         "description": "Pure typographic logo with customized bold lettering. Useful for clean professional branding."
     },
-    {
-        "id": 13,
+    "13": {
         "name": "Abstract Symbolic",
         "description": "Unique symbol not directly tied to a real object. Great for SaaS, fintech, or AI companies."
     },
-    {
-        "id": 14,
+    "14": {
         "name": "Gradient Tech Theme",
         "description": "Color transitions with layered depth and light glows. For web3, crypto, and fintech."
     },
-    {
-        "id": 15,
+    "15": {
         "name": "Retro-Futuristic",
         "description": "80s inspired lines, grids, and neon. Works for vintage tech or entertainment brands."
     },
-    {
-        "id": 16,
+    "16": {
         "name": "Slab Serif Industrial",
         "description": "Heavy serif fonts and structured layouts. For hardware, tools, engineering."
     },
-    {
-        "id": 17,
+    "17": {
         "name": "Hand-Drawn Artisan",
         "description": "Sketchy, personal style. Good for handmade, creative, or local business vibes."
     },
-    {
-        "id": 18,
+    "18": {
         "name": "Gothic/Mechanical",
         "description": "Dark, heavy typography, ornate patterns. For heavy industries, tattoos, or niche fashion."
     },
-    {
-        "id": 19,
+    "19": {
         "name": "Corporate Tech Stack",
         "description": "Clean icon next to name, often in blue/gray. Good for B2B, consulting, SaaS companies."
     },
-    {
-        "id": 20,
+    "20": {
         "name": "Dynamic Motion Style",
         "description": "Lines or arcs showing speed, motion, or transformation. For delivery, automotive, or sports."
     }
-]
+}
