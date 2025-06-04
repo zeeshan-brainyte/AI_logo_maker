@@ -42,29 +42,29 @@ const createPromptTemplate = (prompt) => {
 
 // This function enhances the user prompt with a template using OpenAI's GPT-4 model
 const enhancePromptWithTemplate = async (userPrompt, template) => {
-  const systemPrompt = (
+    const systemPrompt = (
         "You are an AI assistant that enhances image generation prompts. " +
-        "Your task is to take a user's prompt and a template, and generate a detailed and vivid prompt suitable for high-quality image generation."+
-        "You will use details from the template to enrich the user's prompt, ensuring it is clear, descriptive, and ready for image generation."+
+        "Your task is to take a user's prompt and a template, and generate a detailed and vivid prompt suitable for high-quality image generation." +
+        "You will use details from the template to enrich the user's prompt, ensuring it is clear, descriptive, and ready for image generation." +
         "You must include all relevant and correct details from the template in the enhanced prompt like Company Name, slogan, etc."
     );
-  const messages = [
-    { role: "system", content: systemPrompt },
-    { role: "user", content: `User Prompt: ${userPrompt}\nTemplate: ${template}` },
-  ];
+    const messages = [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `User Prompt: ${userPrompt}\nTemplate: ${template}` },
+    ];
 
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4.1",
-      messages: messages,
-    });
+    try {
+        const completion = await openai.chat.completions.create({
+            model: "gpt-4.1",
+            messages: messages,
+        });
 
-    const enhancedPrompt = completion.choices[0].message.content.trim();
-    return enhancedPrompt;
-  } catch (error) {
-    console.error("Error enhancing prompt:", error);
-    throw error;
-  }
+        const enhancedPrompt = completion.choices[0].message.content.trim();
+        return enhancedPrompt;
+    } catch (error) {
+        console.error("Error enhancing prompt:", error);
+        throw error;
+    }
 }
 
 
@@ -127,8 +127,11 @@ exports.upload = async (req, res) => {
                             model: "gpt-image-1",
                             prompt: enhancedPrompt,
                             n: 1,
-                            size: "1024x1024",
-                            background: "opaque",
+                            size: "1024x1024", // ratio 1:1
+                            // size: "1536x1024", // ratio 16:9
+                            // size: "1024x1536", // ratio 9:16
+                            // background: "opaque",
+                            background: "transparent",
                         })
                     )
                 );
@@ -206,7 +209,8 @@ exports.upload = async (req, res) => {
                 size: "1024x1024", // ratio 1:1
                 // size: "1536x1024", // ratio 16:9
                 // size: "1024x1536", // ratio 9:16
-                background: "opaque",
+                // background: "opaque",
+                background: "transparent",
             });
 
             if (!response || !response.data || response.data.length === 0) {
