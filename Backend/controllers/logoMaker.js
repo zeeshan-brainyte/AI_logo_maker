@@ -42,15 +42,16 @@ const createPromptTemplate = (prompt) => {
 
 // This function enhances the user prompt with a template using OpenAI's GPT-4 model
 const enhancePromptWithTemplate = async (userPrompt, template) => {
+    console.log("Enhancing prompt with template...");
     const systemPrompt = (
         "You are an AI assistant that enhances image generation prompts. " +
-        "Your task is to take a user's prompt and a template, and generate a detailed and vivid prompt suitable for high-quality image generation." +
+        "Your task is to take a user's prompt (if given) and a template, and generate a detailed and vivid prompt suitable for high-quality image generation." +
         "You will use details from the template to enrich the user's prompt, ensuring it is clear, descriptive, and ready for image generation." +
         "You must include all relevant and correct details from the template in the enhanced prompt like Company Name, slogan, etc."
     );
     const messages = [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `User Prompt: ${userPrompt}\nTemplate: ${template}` },
+        { role: "user", content: `User Prompt: ${userPrompt ? userPrompt : "No user prompt provided"}\nTemplate: ${template}` },
     ];
 
     try {
@@ -68,14 +69,46 @@ const enhancePromptWithTemplate = async (userPrompt, template) => {
 }
 
 
-exports.upload = async (req, res) => {
+exports.withTemplate = async (req, res) => {
     console.time("Logo generation time");
     try {
         let { prompt } = req.body;
+        // Expecting prompt to be a JSON string with fields like:
+        // prompt = {
+        //     customPrompt: "",
+        //     companyName: "",
+        //     slogan: "",
+        //     industry: "",
+        //     colorScheme: "",
+        //     fontStyle: "",
+        //     stylePreset: "",
+        //     randomStylePreset: false,
+        //     variantCount: 8,
+        // }
         prompt = JSON.parse(prompt);
 
-        if (!prompt) {
-            return res.status(400).json({ error: "Prompt is required" });
+        if (!prompt.companyName || prompt.companyName.trim() === "") {
+            return res.status(400).json({ error: "Company name is required" });
+        }
+        if (!prompt.industry || prompt.industry.trim() === "") {
+            //generate a random industry if not provided
+            const randomIndex = Math.floor(Math.random() * Object.keys(industries).length);
+            prompt.industry = Object.keys(industries)[randomIndex];
+        }
+        if (!prompt.colorScheme || prompt.colorScheme.trim() === "") {
+            //generate a random color scheme if not provided
+            const randomIndex = Math.floor(Math.random() * Object.keys(colorPalettes).length);
+            prompt.colorScheme = Object.keys(colorPalettes)[randomIndex];
+        }
+        if (!prompt.fontStyle || prompt.fontStyle.trim() === "") {
+            //generate a random font style if not provided
+            const randomIndex = Math.floor(Math.random() * Object.keys(fontStyles).length);
+            prompt.fontStyle = Object.keys(fontStyles)[randomIndex];
+        }
+        if (!prompt.stylePreset || prompt.stylePreset.trim() === "") {
+            //generate a random style preset if not provided
+            const randomIndex = Math.floor(Math.random() * Object.keys(stylePresets).length);
+            prompt.stylePreset = Object.keys(stylePresets)[randomIndex];
         }
 
         console.log("Parsed prompt:", prompt);
@@ -190,6 +223,7 @@ exports.upload = async (req, res) => {
             });
         } else {
             // Use the selected stylePreset
+            // console.log("Using selected style preset:", prompt.stylePreset);
             const promptString = createPromptTemplate(prompt);
             const enhancedPrompt = await enhancePromptWithTemplate(prompt.customPrompt, promptString);
             // console.log("Generated prompt string:", promptString);
@@ -204,7 +238,7 @@ exports.upload = async (req, res) => {
             const response = await openai.images.generate({
                 model: "gpt-image-1",
                 prompt: enhancedPrompt,
-                n: Number(prompt.variantCount),
+                n: Number(variantCount),
                 size: "1024x1024", // ratio 1:1
                 // size: "1536x1024", // ratio 16:9
                 // size: "1024x1536", // ratio 9:16
@@ -243,3 +277,91 @@ exports.upload = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+exports.onlyPrompt = async (req, res) => {
+    console.time("Logo generation time");
+    try {
+        const { prompt, variants } = req.body; // Expecting prompt to be a string text
+
+        if (!prompt || prompt.trim() === "" || prompt === null || prompt === undefined) {
+            return res.status(400).json({ error: "Prompt is required" });
+        }
+
+        // If variants is not provided, default to 1
+        const variantCount = variants || 1;
+
+        console.log("Parsed prompt:", prompt);
+
+        // return res.status(200).json({
+        //     message: "Prompt received successfully",
+        //     prompt: prompt,
+        // });
+
+        console.log("Enhancing prompt with template...");
+        const systemPrompt = (
+            "You are an AI assistant that enhances image generation prompts. " +
+            "Your task is to take a user's prompt, and generate a detailed and vivid prompt suitable for high-quality image generation." +
+            "You will use details from the prompt and enrich the user's prompt, ensuring it is clear, descriptive, and ready for image generation." +
+            "You must include all relevant and correct details from the prompt in the enhanced prompt like Company Name, slogan, etc."
+        );
+        const messages = [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: `User Prompt: ${prompt}` },
+        ];
+
+        let enhancedPrompt = prompt; // Default to the original prompt if enhancement fails
+        try {
+            const completion = await openai.chat.completions.create({
+                model: "gpt-4.1",
+                messages: messages,
+            });
+
+            enhancedPrompt = completion.choices[0].message.content.trim();
+        } catch (error) {
+            console.error("Error enhancing prompt:", error);
+            throw error;
+        }
+        console.log("Enhanced prompt:", enhancedPrompt);
+        console.log("Now using enhanced prompt for logo generation...");
+
+        const response = await openai.images.generate({
+            model: "gpt-image-1",
+            prompt: enhancedPrompt,
+            n: Number(variantCount),
+            size: "1024x1024", // ratio 1:1
+            // size: "1536x1024", // ratio 16:9
+            // size: "1024x1536", // ratio 9:16
+            background: "auto", // "opaque" or "transparent"
+        });
+
+        if (!response || !response.data || response.data.length === 0) {
+            console.timeEnd("Logo generation time");
+            return res.status(502).json({
+                error: "No logo generated. Please try again.",
+            });
+        }
+        console.log(`Logo generated successfully.`);
+
+        if (!fs.existsSync("output_logos")) {
+            fs.mkdirSync("output_logos");
+        }
+
+        response.data.forEach((image, idx) => {
+            const image_base64 = image.b64_json;
+            const image_bytes = Buffer.from(image_base64, "base64");
+            fs.writeFileSync(
+                `output_logos/Logo_${Date.now()}_${idx + 1}.png`,
+                image_bytes
+            );
+        });
+
+        console.log("logo saved successfully.");
+        console.timeEnd("Logo generation time");
+        return res.status(200).json({
+            message: "Logo generated successfully",
+        });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}

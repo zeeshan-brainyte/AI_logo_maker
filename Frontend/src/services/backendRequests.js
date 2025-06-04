@@ -61,7 +61,7 @@ export const uploadPrompt = async ({ promptData }) => {
 
     try {
         const res = await axios.post(
-            `${BASE_URL}/logo-maker/upload`,
+            `${BASE_URL}/logo-maker/template`,
             formData,
             {
                 headers: {

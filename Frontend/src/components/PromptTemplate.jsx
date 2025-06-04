@@ -95,7 +95,7 @@ const PromptTemplate = () => {
     };
 
     return (
-        <div className="flex w-full overflow-y-auto justify-center items-center">
+        <div className="flex w-full h-dvh overflow-y-auto justify-center items-center">
             <form
                 onSubmit={handleSubmit}
                 className="w-[90%] md:w-[80%] lg:w-[70%] p-6 "
