@@ -203,7 +203,9 @@ exports.upload = async (req, res) => {
                 model: "gpt-image-1",
                 prompt: enhancedPrompt,
                 n: Number(prompt.variantCount),
-                size: "1024x1024",
+                size: "1024x1024", // ratio 1:1
+                // size: "1536x1024", // ratio 16:9
+                // size: "1024x1536", // ratio 9:16
                 background: "opaque",
             });
 
