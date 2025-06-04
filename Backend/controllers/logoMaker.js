@@ -87,7 +87,7 @@ exports.upload = async (req, res) => {
 
         const variantCount = prompt.variantCount || 8;
 
-        // If randomStylePreset is true, generate unique random style presets
+        // If randomStylePreset is true, generate logos with unique random style presets
         if (prompt.randomStylePreset) {
             const stylePresetIds = Object.keys(stylePresets);
             const uniqueNumbers = generateUniqueRandomNumbers(variantCount, stylePresetIds.length);
@@ -136,7 +136,6 @@ exports.upload = async (req, res) => {
                     )
                 );
             } catch (apiError) {
-                // This catch is unlikely to trigger with allSettled, but keep for safety
                 console.error("Unexpected error during image generation:", apiError);
                 console.timeEnd("Logo generation time");
                 return res.status(502).json({
@@ -190,7 +189,7 @@ exports.upload = async (req, res) => {
                 failedDetails: failures.map(f => f.reason?.message || f.reason?.toString()),
             });
         } else {
-            // Use the selected stylePreset as before
+            // Use the selected stylePreset
             const promptString = createPromptTemplate(prompt);
             const enhancedPrompt = await enhancePromptWithTemplate(prompt.customPrompt, promptString);
             // console.log("Generated prompt string:", promptString);
