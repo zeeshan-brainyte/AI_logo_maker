@@ -9,6 +9,7 @@ import {
 
 const PromptTemplate = () => {
     const [promptData, setPromptData] = useState({
+        customPrompt: "",
         companyName: "",
         slogan: "",
         industry: "",
@@ -105,7 +106,20 @@ const PromptTemplate = () => {
 
                 <div>
                     <label className=" text-sm font-medium text-text-secondary">
-                        Company Name *
+                        Custom Prompt
+                    </label>
+                    <textarea
+                        name="customPrompt"
+                        rows={5}
+                        value={promptData.customPrompt}
+                        onChange={handleChange}
+                        className="mt-1 text-text-primary resize-none focus:outline-none w-full p-2 border border-bg-tertiary rounded-lg"
+                    />
+                </div>
+
+                <div>
+                    <label className=" text-sm font-medium text-text-secondary">
+                        Company Name*
                     </label>
                     <input
                         type="text"

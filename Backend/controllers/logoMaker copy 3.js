@@ -40,34 +40,6 @@ const createPromptTemplate = (prompt) => {
     `;
 };
 
-// This function enhances the user prompt with a template using OpenAI's GPT-4 model
-const enhancePromptWithTemplate = async (userPrompt, template) => {
-  const systemPrompt = (
-        "You are an AI assistant that enhances image generation prompts. " +
-        "Your task is to take a user's prompt and a template, and generate a detailed and vivid prompt suitable for high-quality image generation."+
-        "You will use details from the template to enrich the user's prompt, ensuring it is clear, descriptive, and ready for image generation."+
-        "You must include all relevant and correct details from the template in the enhanced prompt like Company Name, slogan, etc."
-    );
-  const messages = [
-    { role: "system", content: systemPrompt },
-    { role: "user", content: `User Prompt: ${userPrompt}\nTemplate: ${template}` },
-  ];
-
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4.1",
-      messages: messages,
-    });
-
-    const enhancedPrompt = completion.choices[0].message.content.trim();
-    return enhancedPrompt;
-  } catch (error) {
-    console.error("Error enhancing prompt:", error);
-    throw error;
-  }
-}
-
-
 exports.upload = async (req, res) => {
     console.time("Logo generation time");
     try {
@@ -78,9 +50,9 @@ exports.upload = async (req, res) => {
             return res.status(400).json({ error: "Prompt is required" });
         }
 
-        console.log("Parsed prompt:", prompt);
+        // console.log("Parsed prompt:", prompt);
 
-        // return res.status(200).json({
+        // res.status(200).json({
         //     message: "Prompt received successfully",
         //     prompt: prompt,
         // });
@@ -94,38 +66,22 @@ exports.upload = async (req, res) => {
             // console.log("Unique random numbers (style preset ids):", uniqueNumbers);
 
             // Prepare prompts with different style presets
-            const promptPairs = uniqueNumbers.map((num) => {
+            const promptStrings = uniqueNumbers.map((num) => {
                 const stylePresetId = stylePresetIds[num - 1]; // since uniqueNumbers are 1-based
                 const promptWithRandomPreset = { ...prompt, stylePreset: stylePresetId };
-                const template = createPromptTemplate(promptWithRandomPreset);
-                return { userPrompt: prompt.customPrompt, template };
+                return createPromptTemplate(promptWithRandomPreset);
             });
 
-            // Enhance all prompts in parallel
-            let enhancedPrompts;
-            try {
-                enhancedPrompts = await Promise.all(
-                    promptPairs.map(pair => enhancePromptWithTemplate(pair.userPrompt, pair.template))
-                );
-            } catch (enhanceError) {
-                console.error("Error enhancing prompts:", enhanceError);
-                return res.status(500).json({
-                    error: "Failed to enhance prompts.",
-                    details: enhanceError.message || enhanceError.toString(),
-                });
-            }
+            // console.log("Generated prompt strings for random style presets:", promptStrings);
 
-            console.log("Enhanced prompts:", enhancedPrompts);
-            console.log("Now using enhanced prompts for logos generation...");
-
-            // Now use enhancedPrompts for image generation
+            // Run API calls in parallel with error handling
             let results;
             try {
                 results = await Promise.allSettled(
-                    enhancedPrompts.map((enhancedPrompt) =>
+                    promptStrings.map((promptString) =>
                         openai.images.generate({
                             model: "gpt-image-1",
-                            prompt: enhancedPrompt,
+                            prompt: promptString,
                             n: 1,
                             size: "1024x1024",
                             background: "opaque",
@@ -154,8 +110,6 @@ exports.upload = async (req, res) => {
                 });
             }
 
-            console.log(`Generated ${successes.length} logos successfully, ${failures.length} failed.`);
-
             // Save only successful images
             try {
                 if (!fs.existsSync("output_logos")) {
@@ -171,7 +125,6 @@ exports.upload = async (req, res) => {
                         image_bytes
                     );
                 });
-                console.log("All generated images saved successfully.");
             } catch (fsError) {
                 console.error("Error saving generated images:", fsError);
                 console.timeEnd("Logo generation time");
@@ -189,31 +142,15 @@ exports.upload = async (req, res) => {
         } else {
             // Use the selected stylePreset as before
             const promptString = createPromptTemplate(prompt);
-            const enhancedPrompt = await enhancePromptWithTemplate(prompt.customPrompt, promptString);
-            // console.log("Generated prompt string:", promptString);
-            console.log("Enhanced prompt:", enhancedPrompt);
-            console.log("Now using enhanced prompt for logo generation...");
-
-            // return res.status(200).json({
-            //     message: "Prompt generated successfully",
-            //     prompt: enhancedPrompt,
-            // });
+            console.log("Generated prompt string:", promptString);
 
             const response = await openai.images.generate({
                 model: "gpt-image-1",
-                prompt: enhancedPrompt,
+                prompt: promptString,
                 n: Number(prompt.variantCount),
                 size: "1024x1024",
                 background: "opaque",
             });
-
-            if (!response || !response.data || response.data.length === 0) {
-                console.timeEnd("Logo generation time");
-                return res.status(502).json({
-                    error: "No logos generated. Please try again.",
-                });
-            }
-            console.log(`Generated ${response.data.length} logos successfully.`);
 
             if (!fs.existsSync("output_logos")) {
                 fs.mkdirSync("output_logos");
@@ -227,11 +164,9 @@ exports.upload = async (req, res) => {
                     image_bytes
                 );
             });
-
-            console.log("All generated logos saved successfully.");
             console.timeEnd("Logo generation time");
             return res.status(200).json({
-                message: "Logos generated successfully",
+                message: "Logo generated successfully",
             });
         }
     } catch (err) {
