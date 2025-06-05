@@ -23,17 +23,16 @@ const generateUniqueRandomNumbers = (count, max) => {
     return Array.from(numbers);
 };
 
-const createPromptTemplate = (prompt) => {
-    return `Create a high-quality logo for a company named **"${prompt.companyName
-        }"**${prompt.slogan ? ` with the slogan "${prompt.slogan}"` : ""
-        }. The company operates in the **${industries[prompt.industry].industry}** sector.
+const createPromptTemplate = (companyName, slogan, industry, colorScheme, fontStyle, stylePreset) => {
+    return `Create a high-quality logo for a company named **"${companyName}"**${slogan ? ` with the slogan "${slogan}"` : ""
+        }. The company operates in the **${industries[industry].industry}** sector.
 
     The logo should feature:
-    - A **${fontStyles[prompt.fontStyle].description}** typeface
+    - A **${fontStyles[fontStyle].description}** typeface
     - A **centered layout**
-    - A **${colorPalettes[prompt.colorScheme].name}** color scheme using tones like ( ${(colorPalettes[prompt.colorScheme].colors || [])} )
+    - A **${colorPalettes[colorScheme].name}** color scheme using tones like ( ${(colorPalettes[colorScheme].colors || [])} )
     - Designed in **vector-style**, suitable for printing and digital use
-    - Stylized as a **${stylePresets[prompt.stylePreset].name}** (e.g., ${stylePresets[prompt.stylePreset].description})
+    - Stylized as a **${stylePresets[stylePreset].name}** (e.g., ${stylePresets[stylePreset].description})
     - The logo size should be 1024X1024
 
     Make the logo minimalist yet bold, with strong visual impact and clear scalability.
@@ -72,56 +71,45 @@ const enhancePromptWithTemplate = async (userPrompt, template) => {
 exports.withTemplate = async (req, res) => {
     console.time("Logo generation time");
     try {
-        let { prompt } = req.body;
-        // Expecting prompt to be a JSON string with fields like:
-        // prompt = {
-        //     customPrompt: "",
-        //     companyName: "",
-        //     slogan: "",
-        //     industry: "",
-        //     colorScheme: "",
-        //     fontStyle: "",
-        //     stylePreset: "",
-        //     randomStylePreset: false,
-        //     variantCount: 8,
-        // }
-        prompt = JSON.parse(prompt);
+        let { customPrompt, companyName, slogan, industry, colorScheme, fontStyle, stylePreset, randomStylePreset, variants } = req.body;
 
-        if (!prompt.companyName || prompt.companyName.trim() === "") {
+        if (!companyName || companyName.trim() === "") {
             return res.status(400).json({ error: "Company name is required" });
         }
-        if (!prompt.industry || prompt.industry.trim() === "") {
+        if (!industry || industry.trim() === "") {
             //generate a random industry if not provided
             const randomIndex = Math.floor(Math.random() * Object.keys(industries).length);
-            prompt.industry = Object.keys(industries)[randomIndex];
+            industry = Object.keys(industries)[randomIndex];
         }
-        if (!prompt.colorScheme || prompt.colorScheme.trim() === "") {
+        if (!colorScheme || colorScheme.trim() === "") {
             //generate a random color scheme if not provided
             const randomIndex = Math.floor(Math.random() * Object.keys(colorPalettes).length);
-            prompt.colorScheme = Object.keys(colorPalettes)[randomIndex];
+            colorScheme = Object.keys(colorPalettes)[randomIndex];
         }
-        if (!prompt.fontStyle || prompt.fontStyle.trim() === "") {
+        if (!fontStyle || fontStyle.trim() === "") {
             //generate a random font style if not provided
             const randomIndex = Math.floor(Math.random() * Object.keys(fontStyles).length);
-            prompt.fontStyle = Object.keys(fontStyles)[randomIndex];
+            fontStyle = Object.keys(fontStyles)[randomIndex];
         }
-        if (!prompt.stylePreset || prompt.stylePreset.trim() === "") {
+        if (!stylePreset || stylePreset.trim() === "") {
             //generate a random style preset if not provided
             const randomIndex = Math.floor(Math.random() * Object.keys(stylePresets).length);
-            prompt.stylePreset = Object.keys(stylePresets)[randomIndex];
+            stylePreset = Object.keys(stylePresets)[randomIndex];
         }
 
-        console.log("Parsed prompt:", prompt);
+        // if (!customPrompt || customPrompt.trim() === "") {
+        //     customPrompt = ""; // Default to empty string if no custom prompt is provided
+        // }
 
         // return res.status(200).json({
         //     message: "Prompt received successfully",
         //     prompt: prompt,
         // });
 
-        const variantCount = prompt.variantCount || 8;
+        const variantCount = variants || 8;
 
         // If randomStylePreset is true, generate logos with unique random style presets
-        if (prompt.randomStylePreset) {
+        if (randomStylePreset) {
             const stylePresetIds = Object.keys(stylePresets);
             const uniqueNumbers = generateUniqueRandomNumbers(variantCount, stylePresetIds.length);
             // console.log("Unique random numbers (style preset ids):", uniqueNumbers);
@@ -129,9 +117,8 @@ exports.withTemplate = async (req, res) => {
             // Prepare prompts with different style presets
             const promptPairs = uniqueNumbers.map((num) => {
                 const stylePresetId = stylePresetIds[num - 1]; // since uniqueNumbers are 1-based
-                const promptWithRandomPreset = { ...prompt, stylePreset: stylePresetId };
-                const template = createPromptTemplate(promptWithRandomPreset);
-                return { userPrompt: prompt.customPrompt, template };
+                const template = createPromptTemplate(companyName, slogan, industry, colorScheme, fontStyle, stylePresetId);
+                return { userPrompt: customPrompt, template };
             });
 
             // Enhance all prompts in parallel
@@ -163,8 +150,7 @@ exports.withTemplate = async (req, res) => {
                             size: "1024x1024", // ratio 1:1
                             // size: "1536x1024", // ratio 16:9
                             // size: "1024x1536", // ratio 9:16
-                            // background: "opaque",
-                            background: "transparent",
+                            background: "auto", // "opaque" or "transparent"
                         })
                     )
                 );
@@ -202,7 +188,7 @@ exports.withTemplate = async (req, res) => {
                     const image_base64 = image.b64_json;
                     const image_bytes = Buffer.from(image_base64, "base64");
                     fs.writeFileSync(
-                        `output_logos/${prompt.companyName}_${Date.now()}_${idx + 1}.png`,
+                        `output_logos/${companyName}_${Date.now()}_${idx + 1}.png`,
                         image_bytes
                     );
                 });
@@ -223,9 +209,9 @@ exports.withTemplate = async (req, res) => {
             });
         } else {
             // Use the selected stylePreset
-            // console.log("Using selected style preset:", prompt.stylePreset);
-            const promptString = createPromptTemplate(prompt);
-            const enhancedPrompt = await enhancePromptWithTemplate(prompt.customPrompt, promptString);
+            // console.log("Using selected style preset:", stylePreset);
+            const promptString = createPromptTemplate(companyName, slogan, industry, colorScheme, fontStyle, stylePreset);
+            const enhancedPrompt = await enhancePromptWithTemplate(customPrompt, promptString);
             // console.log("Generated prompt string:", promptString);
             console.log("Enhanced prompt:", enhancedPrompt);
             console.log("Now using enhanced prompt for logo generation...");
@@ -242,8 +228,7 @@ exports.withTemplate = async (req, res) => {
                 size: "1024x1024", // ratio 1:1
                 // size: "1536x1024", // ratio 16:9
                 // size: "1024x1536", // ratio 9:16
-                // background: "opaque",
-                background: "transparent",
+                background: "auto", // "opaque" or "transparent"
             });
 
             if (!response || !response.data || response.data.length === 0) {
@@ -262,7 +247,7 @@ exports.withTemplate = async (req, res) => {
                 const image_base64 = image.b64_json;
                 const image_bytes = Buffer.from(image_base64, "base64");
                 fs.writeFileSync(
-                    `output_logos/${prompt.companyName}_${Date.now()}_${idx + 1}.png`,
+                    `output_logos/${companyName}_${Date.now()}_${idx + 1}.png`,
                     image_bytes
                 );
             });
@@ -290,7 +275,7 @@ exports.onlyPrompt = async (req, res) => {
         // If variants is not provided, default to 1
         const variantCount = variants || 1;
 
-        console.log("Parsed prompt:", prompt);
+        console.log("Prompt:", prompt);
 
         // return res.status(200).json({
         //     message: "Prompt received successfully",
