@@ -15,7 +15,7 @@ app.get("/", (req, res) => {
     res.send("AI Logo Maker is running...\n");
 });
 
-app.use("/get-presets", require("./routes/exportPresets"));
+app.use("/presets", upload.none(), require("./routes/presets"));
 app.use("/logo-maker", upload.none(), require("./routes/logoMaker"));
 
 // Start server

@@ -15,7 +15,7 @@ if (!BASE_URL) {
 
 export const getIndustries = async () => {
     try {
-        const res = await axios.get(`${BASE_URL}/get-presets/industries`);
+        const res = await axios.get(`${BASE_URL}/presets/industries`);
         // console.log("Industries fetched successfully:", res.data);
         return res.data;
     } catch (error) {
@@ -26,7 +26,7 @@ export const getIndustries = async () => {
 
 export const getColorSchemes = async () => {
     try {
-        const res = await axios.get(`${BASE_URL}/get-presets/color-palettes`);
+        const res = await axios.get(`${BASE_URL}/presets/color-palettes`);
         // console.log("Color schemes fetched successfully:", res.data);
         return res.data;
     } catch (error) {
@@ -36,7 +36,7 @@ export const getColorSchemes = async () => {
 }
 export const getFontStyles = async () => {
     try {
-        const res = await axios.get(`${BASE_URL}/get-presets/font-styles`);
+        const res = await axios.get(`${BASE_URL}/presets/font-styles`);
         // console.log("Font styles fetched successfully:", res.data);
         return res.data;
     } catch (error) {
@@ -46,7 +46,7 @@ export const getFontStyles = async () => {
 }
 export const getStylePresets = async () => {
     try {
-        const res = await axios.get(`${BASE_URL}/get-presets/style-presets`);
+        const res = await axios.get(`${BASE_URL}/presets/style-presets`);
         // console.log("Style presets fetched successfully:", res.data);
         return res.data;
     } catch (error) {
