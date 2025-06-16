@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const exportPresetsController = require('../controllers/exportPresets');
+const exportPresetsController = require('../controllers/presets');
 
 
 router.get('/color-palettes', exportPresetsController.getColorPalettes);
