@@ -68,6 +68,7 @@ const enhancePromptWithTemplate = async (userPrompt, template) => {
 }
 
 
+// AI LOGO GENERATOR
 exports.withTemplate = async (req, res) => {
     console.time("Logo generation time");
     try {
@@ -106,12 +107,12 @@ exports.withTemplate = async (req, res) => {
         //     prompt: prompt,
         // });
 
-        const variantCount = variants || 8;
+        const quantity = variants || 8;
 
         // If randomStylePreset is true, generate logos with unique random style presets
         if (randomStylePreset) {
             const stylePresetIds = Object.keys(stylePresets);
-            const uniqueNumbers = generateUniqueRandomNumbers(variantCount, stylePresetIds.length);
+            const uniqueNumbers = generateUniqueRandomNumbers(quantity, stylePresetIds.length);
             // console.log("Unique random numbers (style preset ids):", uniqueNumbers);
 
             // Prepare prompts with different style presets
@@ -224,7 +225,7 @@ exports.withTemplate = async (req, res) => {
             const response = await openai.images.generate({
                 model: "gpt-image-1",
                 prompt: enhancedPrompt,
-                n: Number(variantCount),
+                n: Number(quantity),
                 size: "1024x1024", // ratio 1:1
                 // size: "1536x1024", // ratio 16:9
                 // size: "1024x1536", // ratio 9:16
@@ -263,17 +264,19 @@ exports.withTemplate = async (req, res) => {
     }
 };
 
+
+// AI GRAPHICS
 exports.onlyPrompt = async (req, res) => {
     console.time("Logo generation time");
     try {
-        const { prompt, variants } = req.body; // Expecting prompt to be a string text
+        let { prompt, quantity } = req.body; // Expecting prompt to be a string text
 
         if (!prompt || prompt.trim() === "" || prompt === null || prompt === undefined) {
             return res.status(400).json({ error: "Prompt is required" });
         }
 
-        // If variants is not provided, default to 1
-        const variantCount = variants || 1;
+        // If quantity is not provided, default to 1
+        quantity = quantity || 1;
 
         console.log("Prompt:", prompt);
 
@@ -312,7 +315,7 @@ exports.onlyPrompt = async (req, res) => {
         const response = await openai.images.generate({
             model: "gpt-image-1",
             prompt: enhancedPrompt,
-            n: Number(variantCount),
+            n: Number(quantity),
             //size: "1024x1024", // ratio 1:1
             //size: "1536x1024", // ratio 16:9
             size: "1024x1536", // ratio 9:16
