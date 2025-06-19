@@ -23,7 +23,7 @@ const generateUniqueRandomNumbers = (count, max) => {
     return Array.from(numbers);
 };
 
-const createPromptTemplate = (companyName, slogan, industry, colorScheme, fontStyle, stylePreset) => {
+const createPromptTemplate = (companyName, slogan, industry, colorScheme, fontStyle, stylePreset, size) => {
     return `Create a high-quality logo for a company named **"${companyName}"**${slogan ? ` with the slogan "${slogan}"` : ""
         }. The company operates in the **${industries[industry].industry}** sector.
 
@@ -33,7 +33,7 @@ const createPromptTemplate = (companyName, slogan, industry, colorScheme, fontSt
     - A **${colorPalettes[colorScheme].name}** color scheme using tones like ( ${(colorPalettes[colorScheme].colors || [])} )
     - Designed in **vector-style**, suitable for printing and digital use
     - Stylized as a **${stylePresets[stylePreset].name}** (e.g., ${stylePresets[stylePreset].description})
-    - The logo size should be 1024X1024
+    - The logo size should be ${size}
 
     Make the logo minimalist yet bold, with strong visual impact and clear scalability.
     `;
@@ -72,7 +72,7 @@ const enhancePromptWithTemplate = async (userPrompt, template) => {
 exports.withTemplate = async (req, res) => {
     console.time("Logo generation time");
     try {
-        let { customPrompt, companyName, slogan, industry, colorScheme, fontStyle, stylePreset, randomStylePreset, variants } = req.body;
+        let { customPrompt, companyName, slogan, industry, colorScheme, fontStyle, stylePreset, randomStylePreset, quantity, ratio } = req.body;
 
         if (!companyName || companyName.trim() === "") {
             return res.status(400).json({ error: "Company name is required" });
@@ -98,16 +98,26 @@ exports.withTemplate = async (req, res) => {
             stylePreset = Object.keys(stylePresets)[randomIndex];
         }
 
-        // if (!customPrompt || customPrompt.trim() === "") {
-        //     customPrompt = ""; // Default to empty string if no custom prompt is provided
-        // }
 
         // return res.status(200).json({
         //     message: "Prompt received successfully",
         //     prompt: prompt,
         // });
 
-        const quantity = variants || 8;
+        quantity = quantity || 8;
+        ratio = ratio || "1:1"; // Default to 1:1 ratio if not provided
+
+        // Determine the size based on the ratio
+        let size = "1024x1024"; // Default size for 1:1 ratio
+        if (ratio === "1:1") {
+            size = "1024x1024"; // Default size for 1:1 ratio
+        } else if (ratio === "4:3") {
+            size = "1536x1024"; // Size for 4:3 ratio
+        } else if (ratio === "9:16") {
+            size = "1024x1536"; // Size for 9:16 ratio
+        } else {
+            return res.status(400).json({ error: "Invalid ratio provided. Use '1:1', '4:3', or '9:16'." });
+        }
 
         // If randomStylePreset is true, generate logos with unique random style presets
         if (randomStylePreset) {
@@ -118,7 +128,7 @@ exports.withTemplate = async (req, res) => {
             // Prepare prompts with different style presets
             const promptPairs = uniqueNumbers.map((num) => {
                 const stylePresetId = stylePresetIds[num - 1]; // since uniqueNumbers are 1-based
-                const template = createPromptTemplate(companyName, slogan, industry, colorScheme, fontStyle, stylePresetId);
+                const template = createPromptTemplate(companyName, slogan, industry, colorScheme, fontStyle, stylePresetId, size);
                 return { userPrompt: customPrompt, template };
             });
 
@@ -148,9 +158,7 @@ exports.withTemplate = async (req, res) => {
                             model: "gpt-image-1",
                             prompt: enhancedPrompt,
                             n: 1,
-                            size: "1024x1024", // ratio 1:1
-                            // size: "1536x1024", // ratio 16:9
-                            // size: "1024x1536", // ratio 9:16
+                            size: size,
                             background: "auto", // "opaque" or "transparent"
                         })
                     )
@@ -226,9 +234,7 @@ exports.withTemplate = async (req, res) => {
                 model: "gpt-image-1",
                 prompt: enhancedPrompt,
                 n: Number(quantity),
-                size: "1024x1024", // ratio 1:1
-                // size: "1536x1024", // ratio 16:9
-                // size: "1024x1536", // ratio 9:16
+                size: size,
                 background: "auto", // "opaque" or "transparent"
             });
 
@@ -318,7 +324,7 @@ exports.onlyPrompt = async (req, res) => {
             "You are an AI assistant that enhances image generation prompts. " +
             "Your task is to take a user's prompt, and generate a detailed and vivid prompt suitable for high-quality image generation." +
             "You will use details from the prompt and enrich the user's prompt, ensuring it is clear, descriptive, and ready for image generation." +
-            "You must include all relevant and correct details from the prompt in the enhanced prompt like Company Name, slogan, etc."+
+            "You must include all relevant and correct details from the prompt in the enhanced prompt like Company Name, slogan, etc." +
             `You must also make sure that logos are Stylized as a **${stylePresets[stylePreset].name}** (e.g., ${stylePresets[stylePreset].description})`
         );
         const messages = [
