@@ -267,9 +267,9 @@ exports.withTemplate = async (req, res) => {
 
 // AI GRAPHICS
 exports.onlyPrompt = async (req, res) => {
-    console.time("Logo generation time");
+    // console.time("Logo generation time");
     try {
-        let { prompt, quantity } = req.body; // Expecting prompt to be a string text
+        let { prompt, stylePreset, ratio, quantity } = req.body; // Expecting prompt to be a string text
 
         if (!prompt || prompt.trim() === "" || prompt === null || prompt === undefined) {
             return res.status(400).json({ error: "Prompt is required" });
@@ -278,11 +278,39 @@ exports.onlyPrompt = async (req, res) => {
         // If quantity is not provided, default to 1
         quantity = quantity || 1;
 
+        // If ratio is not provided, default to "1:1"
+        ratio = ratio || "1:1";
+
+        // If style is not provided, select a random style preset
+        if (!stylePreset || stylePreset.trim() === "") {
+            //generate a random style preset if not provided
+            const randomIndex = Math.floor(Math.random() * Object.keys(stylePresets).length);
+            stylePreset = Object.keys(stylePresets)[randomIndex];
+        }
+
         console.log("Prompt:", prompt);
+        console.log("Style Preset:", stylePreset);
+        console.log("Ratio:", ratio);
+        console.log("Quantity:", quantity);
+
+        // Determine the size based on the ratio
+        let size = "1024x1024"; // Default size for 1:1 ratio
+        if (ratio === "1:1") {
+            size = "1024x1024"; // Default size for 1:1 ratio
+        } else if (ratio === "4:3") {
+            size = "1536x1024"; // Size for 4:3 ratio
+        } else if (ratio === "9:16") {
+            size = "1024x1536"; // Size for 9:16 ratio
+        } else {
+            return res.status(400).json({ error: "Invalid ratio provided. Use '1:1', '4:3', or '9:16'." });
+        }
 
         // return res.status(200).json({
         //     message: "Prompt received successfully",
         //     prompt: prompt,
+        //     stylePreset: stylePreset,
+        //     ratio: ratio,
+        //     quantity: quantity
         // });
 
         console.log("Enhancing prompt with template...");
@@ -290,7 +318,8 @@ exports.onlyPrompt = async (req, res) => {
             "You are an AI assistant that enhances image generation prompts. " +
             "Your task is to take a user's prompt, and generate a detailed and vivid prompt suitable for high-quality image generation." +
             "You will use details from the prompt and enrich the user's prompt, ensuring it is clear, descriptive, and ready for image generation." +
-            "You must include all relevant and correct details from the prompt in the enhanced prompt like Company Name, slogan, etc."
+            "You must include all relevant and correct details from the prompt in the enhanced prompt like Company Name, slogan, etc."+
+            `You must also make sure that logos are Stylized as a **${stylePresets[stylePreset].name}** (e.g., ${stylePresets[stylePreset].description})`
         );
         const messages = [
             { role: "system", content: systemPrompt },
@@ -316,10 +345,8 @@ exports.onlyPrompt = async (req, res) => {
             model: "gpt-image-1",
             prompt: enhancedPrompt,
             n: Number(quantity),
-            //size: "1024x1024", // ratio 1:1
-            //size: "1536x1024", // ratio 16:9
-            size: "1024x1536", // ratio 9:16
-            background: "auto", // "opaque" or "transparent"
+            size: size,
+            background: "opaque", // "opaque" or "transparent"
         });
 
         if (!response || !response.data || response.data.length === 0) {
@@ -344,7 +371,7 @@ exports.onlyPrompt = async (req, res) => {
         });
 
         console.log("logo saved successfully.");
-        console.timeEnd("Logo generation time");
+        // console.timeEnd("Logo generation time");
         return res.status(200).json({
             message: "Logo generated successfully",
         });
