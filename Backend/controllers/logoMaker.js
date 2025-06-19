@@ -34,10 +34,11 @@ const createPromptTemplate = (companyName, slogan, industry, colorScheme, fontSt
     - Designed in **vector-style**, suitable for printing and digital use
     - Stylized as a **${stylePresets[stylePreset].name}** (e.g., ${stylePresets[stylePreset].description})
     - The logo size should be ${size}
-
+    
     Make the logo minimalist yet bold, with strong visual impact and clear scalability.
     `;
 };
+// - The Logo must be gradient based, with the combination of the color scheme.
 
 // This function enhances the user prompt with a template using OpenAI's GPT-4 model
 const enhancePromptWithTemplate = async (userPrompt, template) => {
@@ -72,7 +73,8 @@ const enhancePromptWithTemplate = async (userPrompt, template) => {
 exports.withTemplate = async (req, res) => {
     console.time("Logo generation time");
     try {
-        let { customPrompt, companyName, slogan, industry, colorScheme, fontStyle, stylePreset, randomStylePreset, quantity, ratio } = req.body;
+        let { customPrompt, companyName, slogan, industry, colorScheme, fontStyle, stylePreset, randomStylePreset, quantity, ratio, background } = req.body;
+
 
         if (!companyName || companyName.trim() === "") {
             return res.status(400).json({ error: "Company name is required" });
@@ -104,7 +106,12 @@ exports.withTemplate = async (req, res) => {
         //     prompt: prompt,
         // });
 
-        quantity = quantity || 8;
+        // If quantity is not provided, default to 8
+        quantity = Number(quantity) || 8;
+        if (quantity < 1 || quantity > 10) {
+            return res.status(400).json({ error: "Quantity must be a number between 1 and 10." });
+        }
+
         ratio = ratio || "1:1"; // Default to 1:1 ratio if not provided
 
         // Determine the size based on the ratio
@@ -119,8 +126,17 @@ exports.withTemplate = async (req, res) => {
             return res.status(400).json({ error: "Invalid ratio provided. Use '1:1', '4:3', or '9:16'." });
         }
 
+        // Determine the background option based on the provided background parameter
+        let backgroundOption = "opaque"; // Default background option
+        if (background && (background === "true" || background === true)) {
+            backgroundOption = "opaque";
+        } else if (background && (background === "false" || background === false)) {
+            backgroundOption = "transparent";
+        }
+
         // If randomStylePreset is true, generate logos with unique random style presets
-        if (randomStylePreset) {
+        if (randomStylePreset && randomStylePreset === true || randomStylePreset === "true") {
+            let images = [];
             const stylePresetIds = Object.keys(stylePresets);
             const uniqueNumbers = generateUniqueRandomNumbers(quantity, stylePresetIds.length);
             // console.log("Unique random numbers (style preset ids):", uniqueNumbers);
@@ -159,7 +175,7 @@ exports.withTemplate = async (req, res) => {
                             prompt: enhancedPrompt,
                             n: 1,
                             size: size,
-                            background: "auto", // "opaque" or "transparent"
+                            background: backgroundOption, // "opaque" or "transparent"
                         })
                     )
                 );
@@ -194,6 +210,7 @@ exports.withTemplate = async (req, res) => {
 
                 successes.forEach((response, idx) => {
                     const image = response.data[0];
+                    images.push(image);
                     const image_base64 = image.b64_json;
                     const image_bytes = Buffer.from(image_base64, "base64");
                     fs.writeFileSync(
@@ -212,14 +229,16 @@ exports.withTemplate = async (req, res) => {
             }
 
             console.timeEnd("Logo generation time");
+            // console.log(successes);
             return res.status(200).json({
                 message: `Logos generated: ${successes.length}. Failed: ${failures.length}.`,
+                results: images,
                 failedDetails: failures.map(f => f.reason?.message || f.reason?.toString()),
             });
         } else {
             // Use the selected stylePreset
             // console.log("Using selected style preset:", stylePreset);
-            const promptString = createPromptTemplate(companyName, slogan, industry, colorScheme, fontStyle, stylePreset);
+            const promptString = createPromptTemplate(companyName, slogan, industry, colorScheme, fontStyle, stylePreset, size);
             const enhancedPrompt = await enhancePromptWithTemplate(customPrompt, promptString);
             // console.log("Generated prompt string:", promptString);
             console.log("Enhanced prompt:", enhancedPrompt);
@@ -235,7 +254,7 @@ exports.withTemplate = async (req, res) => {
                 prompt: enhancedPrompt,
                 n: Number(quantity),
                 size: size,
-                background: "auto", // "opaque" or "transparent"
+                background: backgroundOption, // "opaque" or "transparent"
             });
 
             if (!response || !response.data || response.data.length === 0) {
@@ -263,6 +282,7 @@ exports.withTemplate = async (req, res) => {
             console.timeEnd("Logo generation time");
             return res.status(200).json({
                 message: "Logos generated successfully",
+                results: response.data
             });
         }
     } catch (err) {
@@ -275,14 +295,17 @@ exports.withTemplate = async (req, res) => {
 exports.onlyPrompt = async (req, res) => {
     // console.time("Logo generation time");
     try {
-        let { prompt, stylePreset, ratio, quantity } = req.body; // Expecting prompt to be a string text
+        let { prompt, stylePreset, ratio, quantity, background } = req.body; // Expecting prompt to be a string text
 
         if (!prompt || prompt.trim() === "" || prompt === null || prompt === undefined) {
             return res.status(400).json({ error: "Prompt is required" });
         }
 
         // If quantity is not provided, default to 1
-        quantity = quantity || 1;
+        quantity = Number(quantity) || 1;
+        if (quantity < 1 || quantity > 10) {
+            return res.status(400).json({ error: "Quantity must be a number between 1 and 10." });
+        }
 
         // If ratio is not provided, default to "1:1"
         ratio = ratio || "1:1";
@@ -347,12 +370,22 @@ exports.onlyPrompt = async (req, res) => {
         console.log("Enhanced prompt:", enhancedPrompt);
         console.log("Now using enhanced prompt for logo generation...");
 
+        // Determine the background option based on the provided background parameter
+        let backgroundOption = "opaque"; // Default background option
+        if (background && (background === "true" || background === true)) {
+            backgroundOption = "opaque";
+        } else if (background && (background === "false" || background === false)) {
+            backgroundOption = "transparent";
+        }
+
+        console.log("Background:", background);
+        console.log("Background option:", backgroundOption);
         const response = await openai.images.generate({
             model: "gpt-image-1",
             prompt: enhancedPrompt,
             n: Number(quantity),
             size: size,
-            background: "opaque", // "opaque" or "transparent"
+            background: backgroundOption, // "opaque" or "transparent"
         });
 
         if (!response || !response.data || response.data.length === 0) {
@@ -367,6 +400,7 @@ exports.onlyPrompt = async (req, res) => {
             fs.mkdirSync("output_logos");
         }
 
+        // console.log(response.data);
         response.data.forEach((image, idx) => {
             const image_base64 = image.b64_json;
             const image_bytes = Buffer.from(image_base64, "base64");
@@ -379,7 +413,8 @@ exports.onlyPrompt = async (req, res) => {
         console.log("logo saved successfully.");
         // console.timeEnd("Logo generation time");
         return res.status(200).json({
-            message: "Logo generated successfully",
+            message: "Logos generated successfully",
+            results: response.data
         });
 
     } catch (err) {
