@@ -9,7 +9,8 @@ exports.getColorPalettes = (req, res) => {
     // only return id and names
     const palettes = Object.entries(colorPalettes).map(([id, palette]) => ({
         id,
-        name: palette.name
+        name: palette.name,
+        colors: palette.colors
     }));
     res.json(palettes);
 };
