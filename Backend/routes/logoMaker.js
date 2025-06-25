@@ -3,7 +3,7 @@ const router = express.Router();
 const logoMakerController = require('../controllers/logoMaker');
 
 
-router.post('/template', logoMakerController.withTemplate);
-router.post('/only-prompt', logoMakerController.onlyPrompt);
+router.post('/template', logoMakerController.withTemplate); // AI Logo Maker
+router.post('/only-prompt', logoMakerController.onlyPrompt); // AI Graphics
 
 module.exports = router;
