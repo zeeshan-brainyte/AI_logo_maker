@@ -55,12 +55,12 @@ const enhancePromptWithTemplate = async (userPrompt, template) => {
     ];
 
     try {
-        const completion = await openai.chat.completions.create({
+        const response = await openai.responses.create({
             model: "gpt-4.1",
-            messages: messages,
+            input: messages,
         });
 
-        const enhancedPrompt = completion.choices[0].message.content.trim();
+        const enhancedPrompt = response.output_text.trim();
         return enhancedPrompt;
     } catch (error) {
         console.error("Error enhancing prompt:", error);
@@ -357,12 +357,12 @@ exports.onlyPrompt = async (req, res) => {
 
         let enhancedPrompt = prompt; // Default to the original prompt if enhancement fails
         try {
-            const completion = await openai.chat.completions.create({
+            const response = await openai.responses.create({
                 model: "gpt-4.1",
-                messages: messages,
+                input: messages,
             });
 
-            enhancedPrompt = completion.choices[0].message.content.trim();
+            enhancedPrompt = response.output_text.trim();
         } catch (error) {
             console.error("Error enhancing prompt:", error);
             throw error;
