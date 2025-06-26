@@ -1,5 +1,4 @@
-// n number of hits to enhance the prompt with a template and again n hits to generate n logos using OpenAI's GPT-4 model
-
+// 1 hit to enhance prompt with n templates and n hits to generate n logos
 const { OpenAI } = require("openai");
 const path = require("path");
 const fs = require("fs");
@@ -48,6 +47,7 @@ const enhancePromptWithTemplate = async (userPrompt, template) => {
     const systemPrompt = (
         "You are an AI assistant that enhances image generation prompts. " +
         "Your task is to take a user's prompt (if given) and a template, and generate a detailed and vivid prompt suitable for high-quality image generation." +
+        "You will be given one or more templates separated by a keyword {{nextLogoStyleTemplate}}.You will use these templates seperately(one by one) in combination with the user's prompt, enhance the user prompt with the template individually, and return the prompts seperated by same keyword {{nextLogoStyleTemplate}}." +
         "You will use details from the template to enrich the user's prompt, ensuring it is clear, descriptive, and ready for image generation." +
         "You must include all relevant and correct details from the template in the enhanced prompt like Company Name, slogan, etc."
     );
@@ -61,6 +61,8 @@ const enhancePromptWithTemplate = async (userPrompt, template) => {
             model: "gpt-4.1",
             input: messages,
         });
+
+        console.log("Response nx10: ", response);
 
         const enhancedPrompt = response.output_text.trim();
         return enhancedPrompt;
@@ -102,12 +104,6 @@ exports.withTemplate = async (req, res) => {
             stylePreset = Object.keys(stylePresets)[randomIndex];
         }
 
-
-        // return res.status(200).json({
-        //     message: "Prompt received successfully",
-        //     prompt: prompt,
-        // });
-
         // If quantity is not provided, default to 8
         quantity = Number(quantity) || 8;
         if (quantity < 1 || quantity > 10) {
@@ -147,26 +143,55 @@ exports.withTemplate = async (req, res) => {
             const promptPairs = uniqueNumbers.map((num) => {
                 const stylePresetId = stylePresetIds[num - 1]; // since uniqueNumbers are 1-based
                 const template = createPromptTemplate(companyName, slogan, industry, colorScheme, fontStyle, stylePresetId, size);
-                return { userPrompt: customPrompt, template };
+                return { template };
             });
 
-            // Enhance all prompts in parallel
-            let enhancedPrompts;
-            try {
-                enhancedPrompts = await Promise.all(
-                    promptPairs.map(pair => enhancePromptWithTemplate(pair.userPrompt, pair.template))
-                );
-            } catch (enhanceError) {
-                console.error("Error enhancing prompts:", enhanceError);
-                return res.status(500).json({
-                    error: "Failed to enhance prompts.",
-                    details: enhanceError.message || enhanceError.toString(),
-                });
-            }
+            console.log("Prompt pairs:", promptPairs);
 
-            console.log("Enhanced prompts:", enhancedPrompts);
+            // Convert promptPairs array into a single string separated by "nextPromptStyle"
+            const promptPairsString = promptPairs
+                .map(
+                    (pair) =>
+                        `\ntemplate: ${pair.template}`
+                )
+                .join("\n{{nextLogoStyleTemplate}}\n");
+
+            console.log(promptPairsString);
+
+            const newEnhancedPrompt = await enhancePromptWithTemplate(customPrompt, promptPairsString);
+
+            console.log("New enhanced prompt:", newEnhancedPrompt);
+            return res.status(200).json({
+                message: "Prompt received successfully",
+            });
+
+            // // Enhance all prompts in parallel
+            // let enhancedPrompts;
+            // try {
+            //     enhancedPrompts = await Promise.all(
+            //         promptPairs.map(pair => enhancePromptWithTemplate(pair.userPrompt, pair.template))
+            //     );
+            // } catch (enhanceError) {
+            //     console.error("Error enhancing prompts:", enhanceError);
+            //     return res.status(500).json({
+            //         error: "Failed to enhance prompts.",
+            //         details: enhanceError.message || enhanceError.toString(),
+            //     });
+            // }
+
+            // console.log("Enhanced prompts:", enhancedPrompts);
             console.log("Now using enhanced prompts for logos generation...");
 
+            // Split the enhanced prompt string into an array of prompts using the separator
+            const enhancedPrompts = newEnhancedPrompt
+                .split(/{{nextLogoStyleTemplate}}/gi)
+                .map(p => p.trim())
+                .filter(p => p.length > 0);
+            console.log("Enhanced prompts array:", enhancedPrompts);
+
+            // return res.status(200).json({
+            //     message: "Prompts generated successfully",
+            // });
             // Now use enhancedPrompts for image generation
             let results;
             try {
@@ -190,6 +215,23 @@ exports.withTemplate = async (req, res) => {
                 });
             }
 
+            // const response = await openai.images.generate({
+            //     model: "gpt-image-1",
+            //     prompt: "Generate n number of logos with different styles given in the prompts separated by {{nextLogoStyleTemplate}}. Use each prompt for each logo. \n" + "\n\n" + newEnhancedPrompt,
+            //     n: Number(quantity),
+            //     size: size,
+            //     background: backgroundOption, // "opaque" or "transparent"
+            // })
+
+            // response.data.forEach((image, idx) => {
+            //     const image_base64 = image.b64_json;
+            //     const image_bytes = Buffer.from(image_base64, "base64");
+            //     fs.writeFileSync(
+            //         `output_logos/${companyName}_${Date.now()}_${idx + 1}.png`,
+            //         image_bytes
+            //     );
+            // });
+
             // Separate successful and failed results
             const successes = results.filter(r => r.status === "fulfilled").map(r => r.value);
             const failures = results.filter(r => r.status === "rejected");
@@ -211,6 +253,7 @@ exports.withTemplate = async (req, res) => {
                 }
 
                 successes.forEach((response, idx) => {
+                    console.log("Response nx10: ", response);
                     const image = response.data[0];
                     images.push(image);
                     const image_base64 = image.b64_json;
@@ -258,6 +301,8 @@ exports.withTemplate = async (req, res) => {
                 size: size,
                 background: backgroundOption, // "opaque" or "transparent"
             });
+
+            console.log("Response n=10: ", response);
 
             if (!response || !response.data || response.data.length === 0) {
                 console.timeEnd("Logo generation time");
