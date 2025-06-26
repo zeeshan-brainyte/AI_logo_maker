@@ -423,3 +423,37 @@ exports.onlyPrompt = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 }
+
+// INSPIRE ME
+exports.inspireMe = async (req, res) => {
+    try {
+        let { prompt } = req.body; // Expecting prompt to be a string text
+
+        if (!prompt || prompt.trim() === "" || prompt === null || prompt === undefined) {
+            prompt = "Generate a creative prompt for a logo design"; // Default prompt if not provided
+        }
+
+        // Call the OpenAI API to get inspired prompts
+        const systemPrompt = (
+            "You are an AI assistant that enhances image generation prompts. " +
+            "Your task is to take a user's prompt, and generate a detailed and vivid prompt suitable for high-quality image generation." +
+            "You will use details from the prompt and enrich the user's prompt, ensuring it is clear, descriptive, and ready for image generation." +
+            "You must include all relevant and correct details from the prompt in the enhanced prompt like Company Name, slogan, etc."+
+            "you will only return the enhanced prompt without any additional text or formatting."
+        );
+        const messages = [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: `User Prompt: ${prompt}` },
+        ];
+        const response = await openai.responses.create({
+            model: "gpt-4.1",
+            input: messages
+        });
+
+        const inspiredPrompt = response.output_text;
+        return res.status(200).json({ inspiredPrompt });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
