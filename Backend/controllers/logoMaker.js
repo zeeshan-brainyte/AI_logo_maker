@@ -75,7 +75,7 @@ const enhancePromptWithTemplate = async (userPrompt, template) => {
 exports.withTemplate = async (req, res) => {
     console.time("Logo generation time");
     try {
-        let { customPrompt, companyName, slogan, industry, colorScheme, fontStyle, stylePreset, randomStylePreset, quantity, ratio, background } = req.body;
+        let { customPrompt, companyName, slogan, industry, colorScheme, fontStyle, stylePreset, randomStylePreset, quantity, ratio, background, quality } = req.body;
 
 
         if (!companyName || companyName.trim() === "") {
@@ -112,6 +112,15 @@ exports.withTemplate = async (req, res) => {
         quantity = Number(quantity) || 8;
         if (quantity < 1 || quantity > 10) {
             return res.status(400).json({ error: "Quantity must be a number between 1 and 10." });
+        }
+
+        if (quality && typeof quality === "string" && quality.trim() !== "") {
+            quality = quality.toLowerCase();
+            if (quality !== "high" && quality !== "low") {
+                quality = "low";
+            }
+        } else {
+            quality = "low";
         }
 
         ratio = ratio || "1:1"; // Default to 1:1 ratio if not provided
@@ -177,6 +186,7 @@ exports.withTemplate = async (req, res) => {
                             prompt: enhancedPrompt,
                             n: 1,
                             size: size,
+                            quality: quality,
                             background: backgroundOption, // "opaque" or "transparent"
                         })
                     )
@@ -255,6 +265,7 @@ exports.withTemplate = async (req, res) => {
                 model: "gpt-image-1",
                 prompt: enhancedPrompt,
                 n: Number(quantity),
+                quality: quality,
                 size: size,
                 background: backgroundOption, // "opaque" or "transparent"
             });
@@ -296,10 +307,11 @@ exports.withTemplate = async (req, res) => {
 // AI GRAPHICS
 exports.onlyPrompt = async (req, res) => {
     // console.time("Logo generation time");
+    console.log("AI Graphics...");
     try {
-        let { prompt, stylePreset, ratio, quantity, background } = req.body; // Expecting prompt to be a string text
+        let { prompt, stylePreset, ratio, quantity, background, quality } = req.body; // Expecting prompt to be a string text
 
-        if (!prompt || prompt.trim() === "" || prompt === null || prompt === undefined) {
+        if (!prompt ||typeof prompt !== "string" || prompt.trim() === "" || prompt === null || prompt === undefined) {
             return res.status(400).json({ error: "Prompt is required" });
         }
 
@@ -307,6 +319,15 @@ exports.onlyPrompt = async (req, res) => {
         quantity = Number(quantity) || 1;
         if (quantity < 1 || quantity > 10) {
             return res.status(400).json({ error: "Quantity must be a number between 1 and 10." });
+        }
+
+        if (quality && typeof quality === "string" && quality.trim() !== "") {
+            quality = quality.toLowerCase();
+            if (quality !== "high" && quality !== "low") {
+                quality = "low";
+            }
+        } else {
+            quality = "low";
         }
 
         // If ratio is not provided, default to "1:1"
@@ -323,6 +344,7 @@ exports.onlyPrompt = async (req, res) => {
         console.log("Style Preset:", stylePreset);
         console.log("Ratio:", ratio);
         console.log("Quantity:", quantity);
+        console.log("Quality:", quality);
 
         // Determine the size based on the ratio
         let size = "1024x1024"; // Default size for 1:1 ratio
@@ -386,6 +408,7 @@ exports.onlyPrompt = async (req, res) => {
             model: "gpt-image-1",
             prompt: enhancedPrompt,
             n: Number(quantity),
+            quality: quality,
             size: size,
             background: backgroundOption, // "opaque" or "transparent"
         });
@@ -438,7 +461,7 @@ exports.inspireMe = async (req, res) => {
             "You are an AI assistant that enhances image generation prompts. " +
             "Your task is to take a user's prompt, and generate a detailed and vivid prompt suitable for high-quality image generation." +
             "You will use details from the prompt and enrich the user's prompt, ensuring it is clear, descriptive, and ready for image generation." +
-            "You must include all relevant and correct details from the prompt in the enhanced prompt like Company Name, slogan, etc."+
+            "You must include all relevant and correct details from the prompt in the enhanced prompt like Company Name, slogan, etc." +
             "you will only return the enhanced prompt without any additional text or formatting."
         );
         const messages = [
