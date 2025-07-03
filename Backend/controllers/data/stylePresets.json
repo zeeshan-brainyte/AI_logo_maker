@@ -1,82 +1,102 @@
 {
     "1": {
         "name": "Esports Emblem",
-        "description": "Bold, aggressive, often featuring a mascot or shield. Great for gaming or youth brands."
+        "description": "Bold, aggressive, often featuring a mascot or shield. Great for gaming or youth brands.",
+        "image": "Esports_Emblem.png"
     },
     "2": {
         "name": "Futuristic Tech",
-        "description": "Sleek, angular lines, neon accents, and cyber-inspired forms. Ideal for AI, robotics, SaaS."
+        "description": "Sleek, angular lines, neon accents, and cyber-inspired forms. Ideal for AI, robotics, SaaS.",
+        "image": "Futuristic_Tech.png"
     },
     "3": {
         "name": "Industrial Vector",
-        "description": "Gear elements, strong outlines, dark tones. For engineering, construction, manufacturing."
+        "description": "Gear elements, strong outlines, dark tones. For engineering, construction, manufacturing.",
+        "image": "Industrial_Vector.png"
     },
     "4": {
         "name": "Minimal Geometric",
-        "description": "Clean lines, simple shapes, modern symmetry. Perfect for startups and digital brands."
+        "description": "Clean lines, simple shapes, modern symmetry. Perfect for startups and digital brands.",
+        "image": "Minimal_Geometric.png"
     },
     "5": {
         "name": "Modern Flat Design",
-        "description": "No gradients, simple icons, two-tone palette. Works well for apps and digital tools."
+        "description": "No gradients, simple icons, two-tone palette. Works well for apps and digital tools.",
+        "image": "Modern_Flat.png"
     },
     "6": {
         "name": "Luxury Serif Branding",
-        "description": "Elegant serif fonts, gold/black tones. Suitable for fashion, jewelry, upscale brands."
+        "description": "Elegant serif fonts, gold/black tones. Suitable for fashion, jewelry, upscale brands.",
+        "image": "Luxury_Serif.png"
     },
     "7": {
         "name": "Cyberpunk Aesthetic",
-        "description": "Neon lights, tech armor, high contrast. Perfect for futuristic, gaming, or AI products."
+        "description": "Neon lights, tech armor, high contrast. Perfect for futuristic, gaming, or AI products.",
+        "image": "Cyberpunk_Aesthetic.png"
     },
     "8": {
         "name": "Nature Organic",
-        "description": "Soft, curved forms, earthy colors. Ideal for wellness, environmental, health products."
+        "description": "Soft, curved forms, earthy colors. Ideal for wellness, environmental, health products.",
+        "image": "Nature_Organic.png"
     },
     "9": {
         "name": "Badge / Stamp Style",
-        "description": "Circular or shield layouts with text wraps. Ideal for heritage, outdoor, food & beverage."
+        "description": "Circular or shield layouts with text wraps. Ideal for heritage, outdoor, food & beverage.",
+        "image": "Badge.png"
     },
     "10": {
         "name": "Mascot-Based Logo",
-        "description": "Central illustrated character (e.g., hawk, robot, wolf). Works well for esports, schools."
+        "description": "Central illustrated character (e.g., hawk, robot, wolf). Works well for esports, schools.",
+        "image": "Mascot_Based.png"
     },
     "11": {
         "name": "Lettermark Monogram",
-        "description": "Initial-based logo (e.g., ‘TE’ for Titan Engineering). Ideal for corporate or minimalist brands."
+        "description": "Initial-based logo (e.g., ‘TE’ for Titan Engineering). Ideal for corporate or minimalist brands.",
+        "image": "Lettermark.png"
     },
     "12": {
         "name": "Wordmark Bold",
-        "description": "Pure typographic logo with customized bold lettering. Useful for clean professional branding."
+        "description": "Pure typographic logo with customized bold lettering. Useful for clean professional branding.",
+        "image": "Wordmark_Bold.png"
     },
     "13": {
         "name": "Abstract Symbolic",
-        "description": "Unique symbol not directly tied to a real object. Great for SaaS, fintech, or AI companies."
+        "description": "Unique symbol not directly tied to a real object. Great for SaaS, fintech, or AI companies.",
+        "image": "Abstract_Symbol.png"
     },
     "14": {
         "name": "Gradient Tech Theme",
-        "description": "Color transitions with layered depth and light glows. For web3, crypto, and fintech."
+        "description": "Color transitions with layered depth and light glows. For web3, crypto, and fintech.",
+        "image": "Gradient_Tech.png"
     },
     "15": {
         "name": "Retro-Futuristic",
-        "description": "80s inspired lines, grids, and neon. Works for vintage tech or entertainment brands."
+        "description": "80s inspired lines, grids, and neon. Works for vintage tech or entertainment brands.",
+        "image": "Retro_Futuristic.png"
     },
     "16": {
         "name": "Slab Serif Industrial",
-        "description": "Heavy serif fonts and structured layouts. For hardware, tools, engineering."
+        "description": "Heavy serif fonts and structured layouts. For hardware, tools, engineering.",
+        "image": "Slab_Serif.png"
     },
     "17": {
         "name": "Hand-Drawn Artisan",
-        "description": "Sketchy, personal style. Good for handmade, creative, or local business vibes."
+        "description": "Sketchy, personal style. Good for handmade, creative, or local business vibes.",
+        "image": "Hand_Drawn.png"
     },
     "18": {
         "name": "Gothic/Mechanical",
-        "description": "Dark, heavy typography, ornate patterns. For heavy industries, tattoos, or niche fashion."
+        "description": "Dark, heavy typography, ornate patterns. For heavy industries, tattoos, or niche fashion.",
+        "image": "Gothic.png"
     },
     "19": {
         "name": "Corporate Tech Stack",
-        "description": "Clean icon next to name, often in blue/gray. Good for B2B, consulting, SaaS companies."
+        "description": "Clean icon next to name, often in blue/gray. Good for B2B, consulting, SaaS companies.",
+        "image": "Corporate_Tech.png"
     },
     "20": {
         "name": "Dynamic Motion Style",
-        "description": "Lines or arcs showing speed, motion, or transformation. For delivery, automotive, or sports."
+        "description": "Lines or arcs showing speed, motion, or transformation. For delivery, automotive, or sports.",
+        "image": "Dynamic_Motion.png"
     }
 }

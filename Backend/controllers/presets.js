@@ -31,11 +31,46 @@ exports.getIndustries = (req, res) => {
     res.json(industry);
 };
 
+// exports.getStylePresets = (req, res) => {
+//     const presets = Object.entries(stylePresets).map(([id, preset]) => ({
+//         id,
+//         name: preset.name,
+//         image: preset.image,
+//     }));
+//     res.json(presets);
+// };
+
 exports.getStylePresets = (req, res) => {
-    const presets = Object.entries(stylePresets).map(([id, preset]) => ({
-        id,
-        name: preset.name
-    }));
+    const mode = req.query.mode;
+
+    let imagesDir;
+    if (mode === "ai_logo") {
+        imagesDir = path.join(__dirname, 'data', 'ai_logo_style_images');
+    } else if (mode === "ai_graphics") {
+        imagesDir = path.join(__dirname, 'data', 'ai_graphics_style_images');
+    } else {
+        return res.status(400).json({ error: 'Invalid mode specified. Specify either "ai_logo" or "ai_graphics"' });
+    }
+
+    const presets = Object.entries(stylePresets).map(([id, preset]) => {
+        let imageBase64 = null;
+        if (preset.image) {
+            const imagePath = path.join(imagesDir, preset.image);
+            try {
+                if (fs.existsSync(imagePath)) {
+                    const imageBuffer = fs.readFileSync(imagePath);
+                    imageBase64 = imageBuffer.toString('base64');
+                }
+            } catch (err) {
+                console.error(`Error reading image for style preset ${id}:`, err);
+            }
+        }
+        return {
+            id,
+            name: preset.name,
+            image: imageBase64
+        };
+    });
     res.json(presets);
 };
 
