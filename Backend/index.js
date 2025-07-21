@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
+const logoMakerController = require('./controllers/logoMaker');
+const exportPresetsController = require('./controllers/presets');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger-output.json');
 
@@ -18,8 +20,20 @@ app.get("/", (req, res) => {
     res.send("AI Logo Maker is running...\n");
 });
 
-app.use("/presets", upload.none(), require("./routes/presets"));
-app.use("/logo-maker", upload.none(), require("./routes/logoMaker"));
+// app.use("/presets", upload.none(), require("./routes/presets"));
+// app.use("/logo-maker", upload.none(), require("./routes/logoMaker"));
+
+// Presets endpoints
+app.get('/color-palettes', exportPresetsController.getColorPalettes); // Get color palettes
+app.get('/font-styles', exportPresetsController.getFontStyles); // Get font styles
+app.get('/industries', exportPresetsController.getIndustries); // Get industries
+app.get('/style-presets', exportPresetsController.getStylePresets); // Get style presets
+
+// logo endpoints
+app.post('/ai-logo', upload.none(), logoMakerController.withTemplate); // AI Logo Maker
+app.post('/ai-graphics', upload.none(), logoMakerController.onlyPrompt); // AI Graphics
+app.post('/inspire-me', upload.none(), logoMakerController.inspireMe); // Inspire Me (Enhance Prompt)
+
 
 // Start server
 app.listen(PORT, () => {

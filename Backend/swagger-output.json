@@ -28,7 +28,7 @@
         }
       }
     },
-    "/presets/color-palettes": {
+    "/color-palettes": {
       "get": {
         "description": "",
         "responses": {
@@ -38,7 +38,7 @@
         }
       }
     },
-    "/presets/font-styles": {
+    "/font-styles": {
       "get": {
         "description": "",
         "responses": {
@@ -48,7 +48,7 @@
         }
       }
     },
-    "/presets/industries": {
+    "/industries": {
       "get": {
         "description": "",
         "responses": {
@@ -58,7 +58,7 @@
         }
       }
     },
-    "/presets/style-presets": {
+    "/style-presets": {
       "get": {
         "description": "",
         "parameters": [
@@ -78,7 +78,7 @@
         }
       }
     },
-    "/logo-maker/ai-logo": {
+    "/ai-logo": {
       "post": {
         "description": "",
         "parameters": [
@@ -144,7 +144,7 @@
         }
       }
     },
-    "/logo-maker/ai-graphics": {
+    "/ai-graphics": {
       "post": {
         "description": "",
         "parameters": [
@@ -192,7 +192,7 @@
         }
       }
     },
-    "/logo-maker/inspire-me": {
+    "/inspire-me": {
       "post": {
         "description": "",
         "parameters": [
