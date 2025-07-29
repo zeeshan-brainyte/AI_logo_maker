@@ -3,11 +3,12 @@ import swaggerAutogen from 'swagger-autogen';
 const doc = {
   info: {
     title: 'AI Logo Maker API',
-    description: 'API documentation for AI Logo Maker backend. Provides endpoints for presets and logo generation.'
+    description: 'API documentation for AI Logo Maker backend. LIVE URL: https://ailogomaker.orbitappspk.com/'
   },
-  host: 'localhost:8081',
+//   host: 'localhost:8082',
+  host: 'ailogomaker.orbitappspk.com',
   basePath: "/",
-  schemes: ['http', 'https'],
+  schemes: ['https'],
   consumes: ['application/json'],
   produces: ['application/json'],
 };

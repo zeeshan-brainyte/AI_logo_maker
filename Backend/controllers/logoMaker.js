@@ -71,7 +71,7 @@ const enhancePromptWithTemplate = async (userPrompt, template) => {
 }
 
 
-// AI LOGO GENERATOR
+// MARK: AI LOGO GENERATOR
 exports.withTemplate = async (req, res) => {
     console.time("Logo generation time");
     try {
@@ -223,12 +223,12 @@ exports.withTemplate = async (req, res) => {
                 successes.forEach((response, idx) => {
                     const image = response.data[0];
                     images.push(image);
-                    const image_base64 = image.b64_json;
-                    const image_bytes = Buffer.from(image_base64, "base64");
-                    fs.writeFileSync(
-                        `output_logos/${companyName}_${Date.now()}_${idx + 1}.png`,
-                        image_bytes
-                    );
+                    // const image_base64 = image.b64_json;
+                    // const image_bytes = Buffer.from(image_base64, "base64");
+                    // fs.writeFileSync(
+                    //     `output_logos/${companyName}_${Date.now()}_${idx + 1}.png`,
+                    //     image_bytes
+                    // );
                 });
                 console.log("All generated images saved successfully.");
             } catch (fsError) {
@@ -278,18 +278,18 @@ exports.withTemplate = async (req, res) => {
             }
             console.log(`Generated ${response.data.length} logos successfully.`);
 
-            if (!fs.existsSync("output_logos")) {
-                fs.mkdirSync("output_logos");
-            }
+            // if (!fs.existsSync("output_logos")) {
+            //     fs.mkdirSync("output_logos");
+            // }
 
-            response.data.forEach((image, idx) => {
-                const image_base64 = image.b64_json;
-                const image_bytes = Buffer.from(image_base64, "base64");
-                fs.writeFileSync(
-                    `output_logos/${companyName}_${Date.now()}_${idx + 1}.png`,
-                    image_bytes
-                );
-            });
+            // response.data.forEach((image, idx) => {
+            //     const image_base64 = image.b64_json;
+            //     const image_bytes = Buffer.from(image_base64, "base64");
+            //     fs.writeFileSync(
+            //         `output_logos/${companyName}_${Date.now()}_${idx + 1}.png`,
+            //         image_bytes
+            //     );
+            // });
 
             console.log("All generated logos saved successfully.");
             console.timeEnd("Logo generation time");
@@ -304,7 +304,7 @@ exports.withTemplate = async (req, res) => {
 };
 
 
-// AI GRAPHICS
+// MARK:AI GRAPHICS
 exports.onlyPrompt = async (req, res) => {
     // console.time("Logo generation time");
     console.log("AI Graphics...");
@@ -421,21 +421,21 @@ exports.onlyPrompt = async (req, res) => {
         }
         console.log(`Logo generated successfully.`);
 
-        if (!fs.existsSync("output_logos")) {
-            fs.mkdirSync("output_logos");
-        }
+        // if (!fs.existsSync("output_logos")) {
+        //     fs.mkdirSync("output_logos");
+        // }
 
-        // console.log(response.data);
-        response.data.forEach((image, idx) => {
-            const image_base64 = image.b64_json;
-            const image_bytes = Buffer.from(image_base64, "base64");
-            fs.writeFileSync(
-                `output_logos/Logo_${Date.now()}_${idx + 1}.png`,
-                image_bytes
-            );
-        });
+        // // console.log(response.data);
+        // response.data.forEach((image, idx) => {
+        //     const image_base64 = image.b64_json;
+        //     const image_bytes = Buffer.from(image_base64, "base64");
+        //     fs.writeFileSync(
+        //         `output_logos/Logo_${Date.now()}_${idx + 1}.png`,
+        //         image_bytes
+        //     );
+        // });
 
-        console.log("logo saved successfully.");
+        // console.log("logo saved successfully.");
         // console.timeEnd("Logo generation time");
         return res.status(200).json({
             message: "Logos generated successfully",
@@ -447,7 +447,7 @@ exports.onlyPrompt = async (req, res) => {
     }
 }
 
-// INSPIRE ME
+// MARK: INSPIRE ME
 exports.inspireMe = async (req, res) => {
     try {
         let { prompt } = req.body; // Expecting prompt to be a string text
@@ -479,4 +479,90 @@ exports.inspireMe = async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+}
+
+// MARK: Image Generation
+exports.generateImage = async (req, res) => {
+    try {
+        // console.time("Image Generation Time");
+        console.log("Image Generation Request Received");
+        let { prompt, samples, height, width } = req.body;
+        let imageCount = samples;
+        // console.log("Prompt: ", prompt);
+        // console.log("Image Count: ", imageCount);
+        // console.log("Height: ", height);
+        // console.log("Width: ", width);
+        let size = "1024x1024"; // Default size
+        // "negative_prompt": "painting, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, deformed, ugly, blurry, bad anatomy, bad proportions, extra limbs, cloned face, skinny, glitchy, double torso, extra arms, extra hands, mangled fingers, missing lips, ugly face, distorted face, extra legs, anime",
+
+        if (!prompt || prompt.trim() === "") {
+            return res.status(400).json({ error: "Prompt is required" });
+        }
+
+        if (!imageCount || imageCount === undefined || imageCount === null || Number(imageCount) < 1 || Number(imageCount) > 10) {
+            imageCount = 4; // Default to 4 images if not provided or invalid
+        }
+        if (!height || height === undefined || height === null || Number(height) < 1) {
+            height = "1024"; // Default to 1024px if not provided or invalid
+        }
+        if (!width || width === undefined || width === null || Number(width) < 1) {
+            width = "1024"; // Default to 1024px if not provided or invalid
+        }
+
+        if (Number(height) > Number(width)) {
+            size = "1024x1536"; // Portrait mode
+        } else if (Number(height) < Number(width)) {
+            size = "1536x1024"; // Landscape mode
+        } else {
+            size = "1024x1024"; // Square mode
+        }
+
+        console.log("Prompt: ", prompt);
+        console.log("Image Count: ", imageCount);
+        console.log("Height: ", height);
+        console.log("Width: ", width);
+        console.log("Size: ", size);
+
+        const response = await openai.images.generate({
+            model: "gpt-image-1",
+            prompt: prompt,
+            n: Number(imageCount), // Number of images to generate
+            output_format: "jpeg",
+            quality: "high", // "low", "medium", "high"
+            size: size, // "1024x1024", "1536x1024", "1024x1536",
+            background: "opaque", // "opaque" or "transparent"
+        });
+
+        console.log(response.data?.length, " images generated");
+
+        // const imageUrls: string[] = [];
+        // response.data.forEach((image, idx) => {
+        //     const image_base64 = image.b64_json;
+        //     const image_bytes = Buffer.from(image_base64, "base64");
+        //     const filename = `Logo_${Date.now()}_${idx + 1}.jpg`;
+        //     const filepath = `./src/image-output/${filename}`;
+        //     fs.writeFileSync(filepath, image_bytes);
+
+        //     // Construct the public URL (adjust host/protocol as needed)
+        //     const imageUrl = `https://${req.get('host')}/images/${filename}`;
+        //     imageUrls.push(imageUrl);
+        // });
+
+        console.log("Generated Images sent in response Successfully");
+        // console.timeEnd("Image Generation Time");
+
+        return res.status(200).json({
+            message: "Images generated successfully",
+            // results: imageUrls
+            results: response.data
+        });
+
+    } catch (error) {
+        console.error("Error generating images:", error);
+        if (error instanceof Error) {
+            return res.status(500).json({ error: error.message });
+        }
+        return res.status(500).json({ error: "An unexpected error occurred." });
+    }
+
 }

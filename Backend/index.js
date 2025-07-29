@@ -33,6 +33,7 @@ app.get('/style-presets', exportPresetsController.getStylePresets); // Get style
 app.post('/ai-logo', upload.none(), logoMakerController.withTemplate); // AI Logo Maker
 app.post('/ai-graphics', upload.none(), logoMakerController.onlyPrompt); // AI Graphics
 app.post('/inspire-me', upload.none(), logoMakerController.inspireMe); // Inspire Me (Enhance Prompt)
+app.post('/image-generation', upload.none(), logoMakerController.generateImage); // Generate Images
 
 
 // Start server
